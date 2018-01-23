@@ -2,33 +2,34 @@
 #include <sys/types.h>
 #include <unistd.h>
 int main() {
-    // int i;
-    // i = 10;
-    // int forkval;
-    // forkval=fork();
-    // printf("forkval = %d\n", forkval);
-    // if (forkval==0)
-    // {
-    //     printf("I am the child\n");
-    //     i += 10;
-    // }
-    // else
-    // {
-    //     printf("I am the parent\n");
-    //     i += 20;
-    // }
-    // //if (fork() == 0) i += 20;
-    // printf("i= %d \n", i);
-       pid_t pid;
-     char *const parmList[] = {"-a", NULL};
+    
+    int forkval;
+    int link[2];
+    char inputChar[1000];
+    char *parmList[] = {"-a", NULL};
+    if (pipe(link)==-1)
+    {
+        printf("Pipe Failed" );
+        return 1;
+    }
+    forkval=fork();
 
-     if ((pid = fork()) == -1)
-        perror("fork() error");
-     else if (pid == 0) {
+    if (forkval==0)
+    {
+        close(link[0]);
+        dup2(link[1],1);
         execvp("ls", parmList);
-        printf("Return not expected. Must be an execvp() error.n");
-     }
 
     }
+    else
+    {   
+        close(link[1]);
+        read(link[0], inputChar ,100);
+        close(link[0]);
+        printf("Output:\n%s\n",inputChar);
+    }
+   
+
+}
 
 
