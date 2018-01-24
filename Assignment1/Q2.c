@@ -3,12 +3,12 @@
 #include <unistd.h>
 int main() {
     
-    int forkval;
+    int forkval, nbytes;
     int link[2];
     //create an a array for the pipe
     char inputChar[1000];
     //declear a buffer to receive the data from the pipe
-    char *parmList[] = {"-a", NULL};
+    char *parmList[] = {"ls","-a", NULL};
     //parameters for the execvp command
     if (pipe(link)==-1)
     //create the pipe
@@ -32,13 +32,14 @@ int main() {
         //parent process
         close(link[1]);
         //read from the reading end of the pipe
-        read(link[0], inputChar ,100);
+        nbytes = read(link[0], inputChar ,sizeof(inputChar));
+       // printf("Output: (%.*s)\n", inputChar);
         close(link[0]);
         //display the output
-        printf("Output:\n%s\n",inputChar);
+        printf("Output: \n%.*s\n", nbytes,inputChar);
     }
    
 
 }
 
-
+//mam chd
