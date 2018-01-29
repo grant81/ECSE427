@@ -53,40 +53,48 @@ void addToJobList(char *args[])
     if (head_job == NULL)
     {
         //init the job number with 1
-        
+        job-> number = 1;
         //set its pid from the global variable process_id
-        
+        job-> pid = process_id;
         //cmd can be set to arg[0]
-        
+        job-> cmd = args[0];
         //set the job->next to point to NULL.
-        
+        job-> next = NULL;
         //set the job->spawn using time function
         job->spawn = (unsigned int)time(NULL);
         //set head_job to be the job
-        
+        head_job = job;
         //set current_job to be head_job
-        
+        current_job = head_job;
     }
 
     //Otherwise create a new job node and link the current node to it
     else
     {
         //point current_job to head_job
-        
+        current_job = head_job;
         //traverse the linked list to reach the last job
-       
-
-
+       while(current_job->next != NULL){
+           current_job = current_job->next;
+       }
 
         //init all values of the job like above num,pid,cmd.spawn
-        
+        job-> number = current_job->number + 1;
+        //set its pid from the global variable process_id
+        job-> pid = process_id;
+        //cmd can be set to arg[0]
+        job-> cmd = args[0];
+        //set the job->next to point to NULL.
+        job-> next = NULL;
+        //set the job->spawn using time function
+        job->spawn = (unsigned int)time(NULL);
         
         //make next of current_job point to job
-        
+        current_job->next = job;
         //make job to be current_job
-        
+        current_job = current_job->next;
         //set the next of job to be NULL
-        
+        current_job ->next = NULL;
     }
 }
 
@@ -109,22 +117,25 @@ void refreshJobList()
 
     //traverse through the linked list
     while (current_job != NULL)
-    {
+    {   
+        
         //use waitpid to init ret_pid variable
         ret_pid = waitpid(current_job->pid, NULL, WNOHANG);
         //one of the below needs node removal from linked list
         if (ret_pid == 0)
         {
-            //what does this mean
-            //do the needful
-            
+            //not finished
+            //continue tranverse
+            prev_job = current_job;
+            current_job = prev_job->next;
         }
         else
-        {
-            //what does this mean
-            //do the needful
-            
+        {     
+            prev_job->next = current_job->next;
+            free(current_job);
+            current_job = prev_job->next;
         }
+       
     }
     return;
 }
@@ -139,13 +150,14 @@ void listAllJobs()
     refreshJobList();
 
     //init current_job with head_job
-
+    current_job = head_job;
     //heading row print only once.
     printf("\nID\tPID\tCmd\tstatus\tspawn-time\n");
-        
+        while(current_job->next != NULL){
         //traverse the linked list and print using the following statement for each job
             printf("%d\t%d\t%s\tRUNNING\t%s\n", current_job->number, current_job->pid, current_job->cmd, ctime(&(current_job->spawn)));
-           
+            current_job = current_job->next;
+        }  
         
     return;
 }
@@ -170,11 +182,41 @@ void waitForEmptyLL(int nice, int bg)
 //function to perform word count
  int wordCount(char *filename,char* flag)
  {
-     int cnt;
+     int cnt= 0;
+     FILE *fp;
+     fp = fopen(filename,"r");
+     if(fp){
+         char c;
+        if(flag == "l" || flag =="-l"){
+            while((c = getc(fp))!= EOF){
+                if(c == '\n'){
+                    cnt = cnt+1;
+                }
+            }
+        }
+        else if (flag == "w" || flag =="-w"){
+            while((c = getc(fp))!= EOF){
+                if(c == '\n'|| c == ' '){
+                    while((c = getc(fp))==' '){
+                        cnt = cnt;
+                    }
+                    cnt = cnt+1;
+                }
+            }
+        }
+        else{
+            printf('wrong wc flag');
+        }
+
+     }
+     else{
+         printf('unable to open the file, wrong file');
+     }
      //if flag is l 
      //count the number of lines in the file 
      //set it in cnt
 
+    
      //if flag is w
      //count the number of words in the file
      //set it in cnt
@@ -205,11 +247,20 @@ int waitforjob(char *jobnc)
     trv = head_job;
     //traverse through linked list and find the corresponding job
     //hint : traversal done in other functions too
-    
-        //if correspoding job is found 
+    while(trv->pid != jobnc){
+        
+        trv = trv->next;
+
+    }
+    //if correspoding job is found 
+    if(trv->pid == jobnc){
         //use its pid to make the parent process wait.
         //waitpid with proper argument needed here
-    
+        waitpid(trv->pid,NULL,WUNTRACED);
+    }
+    else{
+        printf("job not find");
+    }
     return 0;
 }
 
@@ -327,22 +378,36 @@ int main(void)
             int result = 0;
             // if no destination directory given 
             // change to home directory 
-
+            if(sizeof(args)/sizeof(args[0]==1)){
+                result = chdir("/home");
+            }
+            else {
+                result = chdir(args[1]);
+            }
             //if given directory does not exist
             //print directory does not exit
-
+            if (result == -1){
+                printf("directory does not exit");
+            }
             //if everthing is fine 
             //change to destination directory 
-        }
+    
         else if (!strcmp("pwd", args[0]))
         {
             //use getcwd and print the current working directory
-            
+            char result[1024];
+            if(getcwd(result,sizeof(result))!=NULL){
+                printf("current working directory : %s\n",result);
+            }
+            else{
+                printf("pmd not success");
+            }
         }
         else if(!strcmp("wc",args[0]))
         {
             //call the word count function
-            wordCount(args[2],args[1]);
+            int count = wordCount(args[2],args[1]);
+            printf("%d in %s",count,args[1]);
         }
         else
         {
