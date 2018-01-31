@@ -1,0 +1,13 @@
+a.out
+as1p2_skeleton.c
+dateOut.txt
+d.txt
+hh.txt
+Q1
+Q1.c
+Q2
+Q2.c
+redirect out.txt
+redirect_out.txt
+tempCodeRunnerFile
+who.txt

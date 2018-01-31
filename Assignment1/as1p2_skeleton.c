@@ -3,22 +3,22 @@
 I declare that the awesomeness below is a genuine piece of work
 and falls under the McGill code of conduct, to the best of my knowledge.
 -----------------------------------------------------------------
-*/ 
+*/
 
 //Please enter your name and McGill ID below
 //Name: <Yingnan Zhao>
 //McGill ID: <260563769>
 
 //all the header files you would require
-#include <stdio.h>  //for standard IO
-#include <unistd.h> //for execvp/dup/dup2
-#include <string.h> //for string manipulation
-#include <stdlib.h> //for fork  
-#include <ctype.h>  //for character type check (isnum,isalpha,isupper etc)
-#include <sys/wait.h>//for waitpid
-#include <fcntl.h>  //open function to open a file. type "man 2 open" in terminal
-#include <time.h>   //to handle time
-
+#include <stdio.h>    //for standard IO
+#include <unistd.h>   //for execvp/dup/dup2
+#include <string.h>   //for string manipulation
+#include <stdlib.h>   //for fork
+#include <ctype.h>    //for character type check (isnum,isalpha,isupper etc)
+#include <sys/wait.h> //for waitpid
+#include <fcntl.h>    //open function to open a file. type "man 2 open" in terminal
+#include <time.h>     //to handle time
+#include <sys/stat.h>
 //pointer to Linked list head
 struct node *head_job = NULL;
 
@@ -53,13 +53,13 @@ void addToJobList(char *args[])
     if (head_job == NULL)
     {
         //init the job number with 1
-        job-> number = 1;
+        job->number = 1;
         //set its pid from the global variable process_id
-        job-> pid = process_id;
+        job->pid = process_id;
         //cmd can be set to arg[0]
-        job-> cmd = args[0];
+        job->cmd = args[0];
         //set the job->next to point to NULL.
-        job-> next = NULL;
+        job->next = NULL;
         //set the job->spawn using time function
         job->spawn = (unsigned int)time(NULL);
         //set head_job to be the job
@@ -74,27 +74,28 @@ void addToJobList(char *args[])
         //point current_job to head_job
         current_job = head_job;
         //traverse the linked list to reach the last job
-       while(current_job->next != NULL){
-           current_job = current_job->next;
-       }
+        while (current_job->next != NULL)
+        {
+            current_job = current_job->next;
+        }
 
         //init all values of the job like above num,pid,cmd.spawn
-        job-> number = current_job->number + 1;
+        job->number = current_job->number + 1;
         //set its pid from the global variable process_id
-        job-> pid = process_id;
+        job->pid = process_id;
         //cmd can be set to arg[0]
-        job-> cmd = args[0];
+        job->cmd = args[0];
         //set the job->next to point to NULL.
-        job-> next = NULL;
+        job->next = NULL;
         //set the job->spawn using time function
         job->spawn = (unsigned int)time(NULL);
-        
+
         //make next of current_job point to job
         current_job->next = job;
         //make job to be current_job
         current_job = current_job->next;
         //set the next of job to be NULL
-        current_job ->next = NULL;
+        current_job->next = NULL;
     }
 }
 
@@ -103,12 +104,12 @@ void addToJobList(char *args[])
 //if they are done executing then remove it
 void refreshJobList()
 {
-    //pointer require to perform operation 
+    //pointer require to perform operation
     //on linked list
     struct node *current_job;
     struct node *prev_job;
-    
-    //variable to store returned pid 
+
+    //variable to store returned pid
     pid_t ret_pid;
 
     //perform init for pointers
@@ -117,8 +118,8 @@ void refreshJobList()
 
     //traverse through the linked list
     while (current_job != NULL)
-    {   
-        
+    {
+
         //use waitpid to init ret_pid variable
         ret_pid = waitpid(current_job->pid, NULL, WNOHANG);
         //one of the below needs node removal from linked list
@@ -130,12 +131,22 @@ void refreshJobList()
             current_job = prev_job->next;
         }
         else
-        {     
-            prev_job->next = current_job->next;
-            free(current_job);
-            current_job = prev_job->next;
+        {
+            if (prev_job == current_job)
+            {
+
+                prev_job = prev_job->next;
+                free(head_job);
+                head_job = prev_job;
+                current_job = prev_job;
+            }
+            else
+            {
+                prev_job->next = current_job->next;
+                free(current_job);
+                current_job = prev_job->next;
+            }
         }
-       
     }
     return;
 }
@@ -150,20 +161,23 @@ void listAllJobs()
     refreshJobList();
 
     //init current_job with head_job
-    current_job = head_job;
-    //heading row print only once.
-    printf("\nID\tPID\tCmd\tstatus\tspawn-time\n");
-        while(current_job->next != NULL){
-        //traverse the linked list and print using the following statement for each job
+    if (head_job != NULL)
+    {
+        current_job = head_job;
+        //heading row print only once.
+        printf("\nID\tPID\tCmd\tstatus\tspawn-time\n");
+        while (current_job != NULL)
+        {
+            //traverse the linked list and print using the following statement for each job
             printf("%d\t%d\t%s\tRUNNING\t%s\n", current_job->number, current_job->pid, current_job->cmd, ctime(&(current_job->spawn)));
             current_job = current_job->next;
-        }  
-        
+        }
+    }
     return;
 }
 
 // wait till the linked list is empty
-// you would have to look for a place 
+// you would have to look for a place
 // where you would call this function.
 // donot modify this function
 void waitForEmptyLL(int nice, int bg)
@@ -180,49 +194,52 @@ void waitForEmptyLL(int nice, int bg)
 }
 
 //function to perform word count
- int wordCount(char *filename,char* flag)
- {
-     int cnt= 0;
-     FILE *fp;
-     fp = fopen(filename,"r");
-     if(fp){
-         char c;
-        if(flag == "l" || flag =="-l"){
-            while((c = getc(fp))!= EOF){
-                if(c == '\n'){
-                    cnt = cnt+1;
-                }
+int wordCount(char *filename, char *flag)
+{
+    int cnt = 0;
+    FILE *fp;
+    fp = fopen("/home/grant/Documents/ECSE427/Assignment1/c.txt", "r");
+    printf('ehre');
+    char c;
+    if (flag == "-l")
+    {
+        while ((c = fgetc(fp)) != EOF)
+        {
+            if (c == '\n')
+            {
+                cnt = cnt + 1;
             }
         }
-        else if (flag == "w" || flag =="-w"){
-            while((c = getc(fp))!= EOF){
-                if(c == '\n'|| c == ' '){
-                    while((c = getc(fp))==' '){
-                        cnt = cnt;
-                    }
-                    cnt = cnt+1;
+    }
+    else if (flag == "-w")
+    {
+        while ((c = fgetc(fp)) != EOF)
+        {
+            if (c == '\n' || c == ' ')
+            {
+                while ((c = fgetc(fp)) == ' ')
+                {
+                    cnt = cnt;
                 }
+                cnt = cnt + 1;
             }
         }
-        else{
-            printf('wrong wc flag');
-        }
+    }
+    else
+    {
+        printf("wrong wc flag\n");
+    }
 
-     }
-     else{
-         printf('unable to open the file, wrong file');
-     }
-     //if flag is l 
-     //count the number of lines in the file 
-     //set it in cnt
+    //if flag is l
+    //count the number of lines in the file
+    //set it in cnt
 
-    
-     //if flag is w
-     //count the number of words in the file
-     //set it in cnt
-
-     return cnt;
- }
+    //if flag is w
+    //count the number of words in the file
+    //set it in cnt
+    fclose(fp);
+    return cnt;
+}
 
 // function to augment waiting times for a process
 // donot modify this function
@@ -247,19 +264,21 @@ int waitforjob(char *jobnc)
     trv = head_job;
     //traverse through linked list and find the corresponding job
     //hint : traversal done in other functions too
-    while(trv->pid != jobnc){
-        
-        trv = trv->next;
+    while (trv->pid != jobn)
+    {
 
+        trv = trv->next;
     }
-    //if correspoding job is found 
-    if(trv->pid == jobnc){
+    //if correspoding job is found
+    if (trv->pid == jobn)
+    {
         //use its pid to make the parent process wait.
         //waitpid with proper argument needed here
-        waitpid(trv->pid,NULL,WUNTRACED);
+        waitpid(trv->pid, NULL, WUNTRACED);
     }
-    else{
-        printf("job not find");
+    else
+    {
+        printf("job not find\n");
     }
     return 0;
 }
@@ -328,7 +347,7 @@ int main(void)
     //flag variables for background, status and nice
     //bg set to 1 if the command is to executed in background
     //nice set to 1 if the command is nice
-    //status  
+    //status
     int bg, status, nice;
 
     //variable to store the process id.
@@ -338,7 +357,7 @@ int main(void)
     //helpful in output redirection
     int fd1, fd2;
 
-    //your terminal executes endlessly unless 
+    //your terminal executes endlessly unless
     //exit command is received
     while (1)
     {
@@ -353,7 +372,7 @@ int main(void)
         //keep asking unless the user enters something
         while (!(cnt >= 1))
             cnt = getcmd("\n>> ", args, &bg, &nice);
-
+        waitForEmptyLL(nice, bg);
         //use the if-else ladder to handle built-in commands
         //built in commands don't need redirection
         //also no need to add them to jobs linked list
@@ -365,7 +384,7 @@ int main(void)
         }
         else if (!strcmp("exit", args[0]))
         {
-            //exit the execution of endless while loop 
+            //exit the execution of endless while loop
             exit(0);
         }
         else if (!strcmp("fg", args[0]))
@@ -376,50 +395,66 @@ int main(void)
         else if (!strcmp("cd", args[0]))
         {
             int result = 0;
-            // if no destination directory given 
-            // change to home directory 
-            if(sizeof(args)/sizeof(args[0]==1)){
+            // if no destination directory given
+            // change to home directory
+            int length = 0;
+            for (int k = 0; k < sizeof(args); ++k)
+            {
+                if (args[k] != NULL)
+                {
+                    length = length + 1;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if (length == 1)
+            {
                 result = chdir("/home");
             }
-            else {
+            else
+            {
                 result = chdir(args[1]);
             }
             //if given directory does not exist
             //print directory does not exit
-            if (result == -1){
-                printf("directory does not exit");
+            if (result == -1)
+            {
+                printf("directory does not exit\n");
             }
-            //if everthing is fine 
-            //change to destination directory 
-    
+            //if everthing is fine
+            //change to destination directory
+        }
         else if (!strcmp("pwd", args[0]))
         {
             //use getcwd and print the current working directory
             char result[1024];
-            if(getcwd(result,sizeof(result))!=NULL){
-                printf("current working directory : %s\n",result);
+            if (getcwd(result, sizeof(result)) != NULL)
+            {
+                printf("current working directory : %s\n", result);
             }
-            else{
+            else
+            {
                 printf("pmd not success");
             }
         }
-        else if(!strcmp("wc",args[0]))
+        else if (!strcmp("wc", args[0]))
         {
             //call the word count function
-            int count = wordCount(args[2],args[1]);
-            printf("%d in %s",count,args[1]);
+            int count = wordCount(args[2], args[1]);
+            printf("%d in %s", count, args[2]);
         }
         else
         {
-            //Now handle the executable commands here 
+            //Now handle the executable commands here
             /* the steps can be..:
             (1) fork a child process using fork()
             (2) the child process will invoke execvp()
             (3) if background is not specified, the parent will wait,
                 otherwise parent starts the next command... */
 
-
-            //hint : samosas are nice but often there 
+            //hint : samosas are nice but often there
             //is a long waiting line for it.
 
             //create a child
@@ -429,52 +464,84 @@ int main(void)
             if (pid > 0)
             {
                 //we are inside parent
-                //printf("inside the parent\n");
+                // printf("inside the parent\n");
+
                 if (bg == 0)
                 {
-                    //FOREGROUND
+
                     // waitpid with proper argument required
+                    pid = waitpid(pid, NULL, WUNTRACED);
                 }
                 else
                 {
-                    //BACKGROUND
+
                     process_id = pid;
                     addToJobList(args);
+                    pid = waitpid(pid, NULL, WNOHANG);
+
                     // waitpid with proper argument required
                 }
             }
             else
             {
                 // we are inside the child
-
+                sleep(20);
                 //introducing augmented delay
                 performAugmentedWait();
-
                 //check for redirection
                 //now you know what does args store
                 //check if args has ">"
                 //if yes set isred to 1
                 //else set isred to 0
+                int i = 0;
+                int length = 0;
+                for (int k = 0; k < sizeof(args); ++k)
+                {
+                    if (args[k] != NULL)
+                    {
+                        length = length + 1;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                for (int j = 0; j < length; ++j)
+                {
 
+                    if (!strcmp(args[j], ">"))
+                    {
+                        isred = 1;
+                        i = j;
+                        break;
+                    }
+                    else
+                    {
+                        isred = 0;
+                    }
+                }
                 //if redirection is enabled
                 if (isred == 1)
                 {
-                    //open file and change output from stdout to that  
+                    //open file and change output from stdout to that
                     //make sure you use all the read write exec authorisation flags
                     //while you use open (man 2 open) to open file
-
+                    fd2 = dup(1);
+                    fd1 = open(args[i + 1], O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
+                    dup2(fd1, 1);
                     //set ">" and redirected filename to NULL
                     args[i] = NULL;
                     args[i + 1] = NULL;
 
                     //run your command
                     execvp(args[0], args);
-
+                    dup2(fd2, 1);
                     //restore to stdout
                     fflush(stdout);
                 }
                 else
                 {
+
                     //simply execute the command.
                     execvp(args[0], args);
                 }
