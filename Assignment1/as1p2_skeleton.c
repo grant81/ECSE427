@@ -198,10 +198,16 @@ int wordCount(char *filename, char *flag)
 {
     int cnt = 0;
     FILE *fp;
-    fp = fopen("/home/grant/Documents/ECSE427/Assignment1/c.txt", "r");
-    printf('ehre');
+    fp = fopen(filename, "r");
     char c;
-    if (flag == "-l")
+    if(fp == NULL){
+        if (!(!strcmp("-l", flag)||!strcmp("-w",flag))){
+            printf("unrecognized flag\n");
+        }
+        printf ("file does not exist\n");
+        return 0;
+    }
+    if (!strcmp("-l", flag))
     {
         while ((c = fgetc(fp)) != EOF)
         {
@@ -211,7 +217,7 @@ int wordCount(char *filename, char *flag)
             }
         }
     }
-    else if (flag == "-w")
+    else if (!strcmp("-w",flag))
     {
         while ((c = fgetc(fp)) != EOF)
         {
@@ -227,16 +233,9 @@ int wordCount(char *filename, char *flag)
     }
     else
     {
-        printf("wrong wc flag\n");
+        printf("unrecognized flag\n");
     }
 
-    //if flag is l
-    //count the number of lines in the file
-    //set it in cnt
-
-    //if flag is w
-    //count the number of words in the file
-    //set it in cnt
     fclose(fp);
     return cnt;
 }
@@ -264,16 +263,17 @@ int waitforjob(char *jobnc)
     trv = head_job;
     //traverse through linked list and find the corresponding job
     //hint : traversal done in other functions too
-    while (trv->pid != jobn)
+    while (trv->number != jobn)
     {
 
         trv = trv->next;
     }
     //if correspoding job is found
-    if (trv->pid == jobn)
+    if (trv->number == jobn)
     {
         //use its pid to make the parent process wait.
         //waitpid with proper argument needed here
+        printf("Bringing jobno %d and pid %d to foreground\n",trv->number,trv->pid);
         waitpid(trv->pid, NULL, WUNTRACED);
     }
     else
@@ -389,7 +389,7 @@ int main(void)
         }
         else if (!strcmp("fg", args[0]))
         {
-            //bring a background process to foregrounf
+            //bring a background process to foreground
             waitforjob(args[1]);
         }
         else if (!strcmp("cd", args[0]))
@@ -421,7 +421,7 @@ int main(void)
             //print directory does not exit
             if (result == -1)
             {
-                printf("directory does not exit\n");
+                printf("%s no such file or directory\n",args[1]);
             }
             //if everthing is fine
             //change to destination directory
@@ -432,7 +432,7 @@ int main(void)
             char result[1024];
             if (getcwd(result, sizeof(result)) != NULL)
             {
-                printf("current working directory : %s\n", result);
+                printf("%s\n", result);
             }
             else
             {
@@ -442,8 +442,8 @@ int main(void)
         else if (!strcmp("wc", args[0]))
         {
             //call the word count function
-            int count = wordCount(args[2], args[1]);
-            printf("%d in %s", count, args[2]);
+            int count = wordCount(args[2],args[1]);
+            printf("%d", count);
         }
         else
         {
@@ -487,7 +487,7 @@ int main(void)
                 // we are inside the child
                 sleep(20);
                 //introducing augmented delay
-                performAugmentedWait();
+                //performAugmentedWait();
                 //check for redirection
                 //now you know what does args store
                 //check if args has ">"
