@@ -1,0 +1,21 @@
+a.out
+as1p2_skeleton
+as1p2_skeleton.c
+c.txt
+datee.txt
+dateOut.txt
+date.txt
+d.txt
+hh.txt
+out.txt
+Q1
+Q1.c
+Q2
+Q2.c
+redirect out.txt
+redirect_out.txt
+t
+t.c
+tempCodeRunnerFile
+who.txt
+wh.txt

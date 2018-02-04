@@ -125,25 +125,28 @@ void refreshJobList()
         //one of the below needs node removal from linked list
         if (ret_pid == 0)
         {
-            //not finished
+            //the returned pid =0 means process not finished
             //continue tranverse
             prev_job = current_job;
             current_job = prev_job->next;
         }
         else
-        {
+        {   //the returned pid is not 0 means job finished
             if (prev_job == current_job)
             {
-
+                //handle the case where both pointers are at head
+                //move both of them and the head pointer to the next item
                 prev_job = prev_job->next;
                 free(head_job);
+                //pop the head item
                 head_job = prev_job;
                 current_job = prev_job;
             }
             else
-            {
+            {   //the case where current = prev.next
                 prev_job->next = current_job->next;
                 free(current_job);
+                //remove the item the current pointer points to
                 current_job = prev_job->next;
             }
         }
@@ -195,12 +198,16 @@ void waitForEmptyLL(int nice, int bg)
 
 //function to perform word count
 int wordCount(char *filename, char *flag)
-{
+{   
+    //initialize the counter
     int cnt = 0;
+    //create a file object and have it points to the file location
     FILE *fp;
     fp = fopen(filename, "r");
     char c;
+    //handling the case that the file does not exist
     if(fp == NULL){
+        //check the flag
         if (!(!strcmp("-l", flag)||!strcmp("-w",flag))){
             printf("unrecognized flag\n");
         }
@@ -208,23 +215,25 @@ int wordCount(char *filename, char *flag)
         return 0;
     }
     if (!strcmp("-l", flag))
-    {
+    {   //the count line casew
         while ((c = fgetc(fp)) != EOF)
-        {
+        { //traverse the characters in the file
             if (c == '\n')
-            {
+            {    //increase the counter if encounter '\n'
                 cnt = cnt + 1;
             }
         }
     }
     else if (!strcmp("-w",flag))
-    {
+    {   
+        //the count word case
         while ((c = fgetc(fp)) != EOF)
         {
+            //traverse the characters in the file
             if (c == '\n' || c == ' ')
-            {
+            {   //increase the counter if encounter '\n' or ' '
                 while ((c = fgetc(fp)) == ' ')
-                {
+                {   //handle the case where there are conscutive ' ' 
                     cnt = cnt;
                 }
                 cnt = cnt + 1;
@@ -232,7 +241,7 @@ int wordCount(char *filename, char *flag)
         }
     }
     else
-    {
+    {   //handle wrong flag
         printf("unrecognized flag\n");
     }
 
@@ -265,7 +274,7 @@ int waitforjob(char *jobnc)
     //hint : traversal done in other functions too
     while (trv->number != jobn)
     {
-
+        //find the job in the list where the job number = jobnc
         trv = trv->next;
     }
     //if correspoding job is found
@@ -274,10 +283,12 @@ int waitforjob(char *jobnc)
         //use its pid to make the parent process wait.
         //waitpid with proper argument needed here
         printf("Bringing jobno %d and pid %d to foreground\n",trv->number,trv->pid);
+        //make the parent process wait the child process with the pid
         waitpid(trv->pid, NULL, WUNTRACED);
     }
     else
     {
+        //handle the case of wrong input
         printf("job not find\n");
     }
     return 0;
@@ -372,6 +383,7 @@ int main(void)
         //keep asking unless the user enters something
         while (!(cnt >= 1))
             cnt = getcmd("\n>> ", args, &bg, &nice);
+        //handle the nice flag
         waitForEmptyLL(nice, bg);
         //use the if-else ladder to handle built-in commands
         //built in commands don't need redirection
@@ -397,6 +409,7 @@ int main(void)
             int result = 0;
             // if no destination directory given
             // change to home directory
+            //get the number of items in the input args array
             int length = 0;
             for (int k = 0; k < sizeof(args); ++k)
             {
@@ -409,12 +422,13 @@ int main(void)
                     break;
                 }
             }
+            //handle the case where input is just cd 
             if (length == 1)
             {
                 result = chdir("/home");
             }
             else
-            {
+            {   // handle the case where input is cd /some address
                 result = chdir(args[1]);
             }
             //if given directory does not exist
@@ -469,12 +483,12 @@ int main(void)
                 if (bg == 0)
                 {
 
-                    // waitpid with proper argument required
+                    // if bg flag is 0, make the parent wait unitl the child finish
                     pid = waitpid(pid, NULL, WUNTRACED);
                 }
                 else
                 {
-
+                    //the bg flag is 1, add the job to the list 
                     process_id = pid;
                     addToJobList(args);
                     pid = waitpid(pid, NULL, WNOHANG);
@@ -485,9 +499,8 @@ int main(void)
             else
             {
                 // we are inside the child
-                sleep(20);
                 //introducing augmented delay
-                //performAugmentedWait();
+                performAugmentedWait();
                 //check for redirection
                 //now you know what does args store
                 //check if args has ">"
@@ -495,6 +508,7 @@ int main(void)
                 //else set isred to 0
                 int i = 0;
                 int length = 0;
+                //get the number of items in the input args array
                 for (int k = 0; k < sizeof(args); ++k)
                 {
                     if (args[k] != NULL)
@@ -506,12 +520,14 @@ int main(void)
                         break;
                     }
                 }
+                //using the loop below to find if there is '>' in the args[]
                 for (int j = 0; j < length; ++j)
                 {
 
                     if (!strcmp(args[j], ">"))
                     {
                         isred = 1;
+                        //record the index of '>' in args[]
                         i = j;
                         break;
                     }
@@ -526,8 +542,11 @@ int main(void)
                     //open file and change output from stdout to that
                     //make sure you use all the read write exec authorisation flags
                     //while you use open (man 2 open) to open file
+                    //save a copy of the file descripter of stdout
                     fd2 = dup(1);
+                    //get the file descripter that write to a file 
                     fd1 = open(args[i + 1], O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
+                    //redirect the stdout fd
                     dup2(fd1, 1);
                     //set ">" and redirected filename to NULL
                     args[i] = NULL;
@@ -535,6 +554,7 @@ int main(void)
 
                     //run your command
                     execvp(args[0], args);
+                    //restore the stdout fd
                     dup2(fd2, 1);
                     //restore to stdout
                     fflush(stdout);

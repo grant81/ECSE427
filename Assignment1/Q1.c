@@ -9,8 +9,8 @@ int main(){
     bak = dup(1);//make a copy of the current file descriptor
     close(1);//close stdout at the default location
     fd = open("redirect_out.txt",O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
-    //get the file descripter to write to a file descriptor 
-    if(fd <0){
+    //get the file descripter that write to a file 
+    if(fd <0){//handle error
         return -1;
     }
     dup(fd);//copy the file writing descripter to the descriptor we just closed(lowest numbered) 

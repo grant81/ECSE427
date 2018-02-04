@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
-
+#include <sys/wait.h> //for waitpid
 int main() {
     
     int forkval, nbytes;
@@ -20,8 +20,7 @@ int main() {
     forkval=fork();
 
     if (forkval==0)
-    {   //child process
-        printf("tryme");
+    {   //child processs
         close(link[0]);
         //redirect the stdout to the writing end of the pipe
         dup2(link[1],1);
@@ -31,7 +30,7 @@ int main() {
     }
     else
     {   
-        wait(NULL)
+        waitpid(forkval, NULL, WUNTRACED);
         //parent process
         close(link[1]);
         //read from the reading end of the pipe
