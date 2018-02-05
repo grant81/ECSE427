@@ -18,7 +18,8 @@ and falls under the McGill code of conduct, to the best of my knowledge.
 #include <sys/wait.h> //for waitpid
 #include <fcntl.h>    //open function to open a file. type "man 2 open" in terminal
 #include <time.h>     //to handle time
-#include <sys/stat.h>
+#include <sys/stat.h>//flags
+
 //pointer to Linked list head
 struct node *head_job = NULL;
 
@@ -545,10 +546,10 @@ int main(void)
                     //save a copy of the file descripter of stdout
                     fd2 = dup(1);
                     //get the file descripter that write to a file 
-                    fd1 = open(args[i + 1], O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
+                    fd1 = open(args[i + 1], O_WRONLY | O_APPEND | O_CREAT, 0777);//-rwxrwxrwx
+                    dup2(fd1, 1); 
                     //redirect the stdout fd
-                    dup2(fd1, 1);
-                    //set ">" and redirected filename to NULL
+                    //set ">" and redirected filename in input array to NULL
                     args[i] = NULL;
                     args[i + 1] = NULL;
 
