@@ -1,3 +1,13 @@
+/*
+----------------- COMP 310/ECSE 427 Winter 2018 -----------------
+I declare that the awesomeness below is a genuine piece of work
+and falls under the McGill code of conduct, to the best of my knowledge.
+-----------------------------------------------------------------
+*/
+
+//Please enter your name and McGill ID below
+//Name: <Yingnan Zhao>
+//McGill ID: <260563769>
 #include<stdio.h>
 #include<fcntl.h>
 #include <sys/stat.h>

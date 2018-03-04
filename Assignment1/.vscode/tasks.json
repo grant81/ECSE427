@@ -7,7 +7,7 @@
             "label": "test",
             "type": "shell",
             "command": "gcc",
-            "args": ["-g", "-std=c99","Q2.c"],
+            "args": ["-g", "-std=c99","as1p2_skeleton.c"],
             "showOutput": "always",
             "group": {
                 "kind": "build",

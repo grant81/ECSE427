@@ -6,19 +6,19 @@ int main() {
     i = 10;
     int forkval;
     forkval=fork();
-    printf("forkval = %d\n", forkval);
+    printf("forkval = %d", forkval);
     if (forkval==0)
     {
-        printf("I am the child\n");
+        printf("I am the child");
         i += 10;
     }
     else
     {
-        printf("I am the parent\n");
+        printf("I am the parent");
         i += 20;
     }
     //if (fork() == 0) i += 20;
-    printf("i= %d \n", i);
+    printf("i= %d n", i);
     }
 // struct person{
 //     char name[15];
