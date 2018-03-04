@@ -1,0 +1,208 @@
+You entered: 1 airplanes per hour
+You entered: 1 taxis
+Creating airplane thread 0
+Airplane 0 arrives with 6 passengers
+1000000 enqueued to queue
+Passenger 1000000 of airplane 0 arrives to platform
+1000001 enqueued to queue
+Passenger 1000001 of airplane 0 arrives to platform
+1000002 enqueued to queue
+Passenger 1000002 of airplane 0 arrives to platform
+1000003 enqueued to queue
+Passenger 1000003 of airplane 0 arrives to platform
+1000004 enqueued to queue
+Passenger 1000004 of airplane 0 arrives to platform
+1000005 enqueued to queue
+Passenger 1000005 of airplane 0 arrives to platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000000 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000001 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000002 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000003 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000004 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000005 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 waits for passengers to enter the platform
+Airplane 0 arrives with 8 passengers
+1000000 enqueued to queue
+Passenger 1000000 of airplane 0 arrives to platform
+1000001 enqueued to queue
+Passenger 1000001 of airplane 0 arrives to platform
+1000002 enqueued to queue
+Passenger 1000002 of airplane 0 arrives to platform
+1000003 enqueued to queue
+Passenger 1000003 of airplane 0 arrives to platform
+1000004 enqueued to queue
+Passenger 1000004 of airplane 0 arrives to platform
+1000005 enqueued to queue
+Passenger 1000005 of airplane 0 arrives to platform
+1000006 enqueued to queue
+Passenger 1000006 of airplane 0 arrives to platform
+1000007 enqueued to queue
+Passenger 1000007 of airplane 0 arrives to platform
+Taxi driver 0 picked up client 1000000 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000001 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000002 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000003 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000004 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000005 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000006 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000007 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 waits for passengers to enter the platform
+Airplane 0 arrives with 5 passengers
+1000000 enqueued to queue
+Passenger 1000000 of airplane 0 arrives to platform
+1000001 enqueued to queue
+Passenger 1000001 of airplane 0 arrives to platform
+1000002 enqueued to queue
+Passenger 1000002 of airplane 0 arrives to platform
+1000003 enqueued to queue
+Passenger 1000003 of airplane 0 arrives to platform
+1000004 enqueued to queue
+Passenger 1000004 of airplane 0 arrives to platform
+Taxi driver 0 picked up client 1000000 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000001 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000002 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000003 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000004 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 waits for passengers to enter the platform
+Airplane 0 arrives with 8 passengers
+1000000 enqueued to queue
+Passenger 1000000 of airplane 0 arrives to platform
+1000001 enqueued to queue
+Passenger 1000001 of airplane 0 arrives to platform
+1000002 enqueued to queue
+Passenger 1000002 of airplane 0 arrives to platform
+1000003 enqueued to queue
+Passenger 1000003 of airplane 0 arrives to platform
+1000004 enqueued to queue
+Passenger 1000004 of airplane 0 arrives to platform
+1000005 enqueued to queue
+Passenger 1000005 of airplane 0 arrives to platform
+1000006 enqueued to queue
+Passenger 1000006 of airplane 0 arrives to platform
+1000007 enqueued to queue
+Passenger 1000007 of airplane 0 arrives to platform
+Taxi driver 0 picked up client 1000000 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000001 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000002 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000003 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000004 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000005 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000006 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000007 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 waits for passengers to enter the platform
+Airplane 0 arrives with 5 passengers
+1000000 enqueued to queue
+Passenger 1000000 of airplane 0 arrives to platform
+1000001 enqueued to queue
+Passenger 1000001 of airplane 0 arrives to platform
+1000002 enqueued to queue
+Passenger 1000002 of airplane 0 arrives to platform
+1000003 enqueued to queue
+Passenger 1000003 of airplane 0 arrives to platform
+1000004 enqueued to queue
+Passenger 1000004 of airplane 0 arrives to platform
+Taxi driver 0 picked up client 1000000 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000001 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000002 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000003 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000004 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 waits for passengers to enter the platform
+Airplane 0 arrives with 6 passengers
+1000000 enqueued to queue
+Passenger 1000000 of airplane 0 arrives to platform
+1000001 enqueued to queue
+Passenger 1000001 of airplane 0 arrives to platform
+1000002 enqueued to queue
+Passenger 1000002 of airplane 0 arrives to platform
+1000003 enqueued to queue
+Passenger 1000003 of airplane 0 arrives to platform
+1000004 enqueued to queue
+Passenger 1000004 of airplane 0 arrives to platform
+1000005 enqueued to queue
+Passenger 1000005 of airplane 0 arrives to platform
+Taxi driver 0 picked up client 1000000 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000001 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000002 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000003 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000004 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000005 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 waits for passengers to enter the platform
+Airplane 0 arrives with 6 passengers
+1000000 enqueued to queue
+Passenger 1000000 of airplane 0 arrives to platform
+1000001 enqueued to queue
+Passenger 1000001 of airplane 0 arrives to platform
+1000002 enqueued to queue
+Passenger 1000002 of airplane 0 arrives to platform
+1000003 enqueued to queue
+Passenger 1000003 of airplane 0 arrives to platform
+1000004 enqueued to queue
+Passenger 1000004 of airplane 0 arrives to platform
+1000005 enqueued to queue
+Passenger 1000005 of airplane 0 arrives to platform
+Taxi driver 0 picked up client 1000000 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000001 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000002 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000003 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000004 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 picked up client 1000005 from the platform
+Taxi driver 0 arrives
+Taxi driver 0 waits for passengers to enter the platform
+Airplane 0 arrives with 6 passengers
+1000000 enqueued to queue
+Passenger 1000000 of airplane 0 arrives to platform
+1000001 enqueued to queue
+Passenger 1000001 of airplane 0 arrives to platform
+1000002 enqueued to queue
+Passenger 1000002 of airplane 0 arrives to platform
+1000003 enqueued to queue
+Passenger 1000003 of airplane 0 arrives to platform
+1000004 enqueued to queue
+Passenger 1000004 of airplane 0 arrives to platform
+1000005 enqueued to queue
+Passenger 1000005 of airplane 0 arrives to platform
+Taxi driver 0 pic

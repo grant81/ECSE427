@@ -19,7 +19,8 @@
 #include <unistd.h>
 #include <limits.h>
 #include <semaphore.h>
-
+#include <sys/stat.h>
+#include<fcntl.h>
 int BUFFER_SIZE = 100; //size of queue
 
 // A structure to represent a queue
@@ -154,7 +155,7 @@ void *FnTaxi(void *pr_id)
     {
         int travelTime = rand() % 21 + 10;
         usleep(travelTime);
-        printf("Taxi driver 0 arrives\n", taxiID);
+        printf("Taxi driver %d arrives\n", taxiID);
         sem_getvalue(&full, &fullValue);
         if (fullValue == 0)
         {
@@ -169,6 +170,7 @@ void *FnTaxi(void *pr_id)
     }
 }
 
+    
 int main(int argc, char *argv[])
 {
 
@@ -177,10 +179,16 @@ int main(int argc, char *argv[])
 
     num_airplanes = atoi(argv[1]);
     num_taxis = atoi(argv[2]);
-
+    int bak,fd;
+    bak = dup(1);//make a copy of the current file descriptor
+    close(1);//close stdout at the default location
+    fd = open("simulation_out.txt",O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
+    if(fd <0){//handle error
+        return -1;
+    }
+    dup(fd);
     printf("You entered: %d airplanes per hour\n", num_airplanes);
     printf("You entered: %d taxis\n", num_taxis);
-
     //initialize queue
     queue = createQueue(BUFFER_SIZE);
 
