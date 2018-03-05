@@ -7,9 +7,9 @@
             "label": "test",
             "type": "shell",
             "command": "gcc",
-            "args": ["-g", "-std=c99","air_taxi_sim_skeleton.c","-lpthread"],
+            "args": ["-g", "-std=c99","air_taxi_sim_skeleton.c","-lpthread","-o","air_taxi_sim"],
             "showOutput": "always",
-            "group": {
+            "group": { 
                 "kind": "build",
                 "isDefault": true
             }
