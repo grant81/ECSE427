@@ -32,15 +32,21 @@ int **need;
 int **hold;
 void request_simulator(int pr_id, int *request_vector)
 {
-    printf("simulating request for %d\n", pr_id);
+    printf("simulating request for %d", pr_id);
+    printArray(need[pr_id],numResource);
     for (int i = 0; i < numResource; i++)
     {
         if (need[pr_id][i] != 0)
         {
-            printf("divide by %d\n", need[pr_id][i]);
+            
             request_vector[i] = rand() % (need[pr_id][i]) + 1;
+            
+        }
+        else{
+            request_vector[i] = 0;
         }
     }
+    printArray(request_vector,numResource);
 }
 /*
 Implementation of isSafe() as described in the slides
@@ -79,7 +85,7 @@ int isSafe()
                     }
                     finish[i] = 1;
                     sum += 1;
-                    i = -1;
+                    i = -1;//loop extra
                 }
             }
         }
@@ -151,8 +157,8 @@ void *process_simulator(void *pr_id)
 
     while (1)
     {
-        request_simulator(processID, request_vector);
         pthread_mutex_lock(&mutex);
+        request_simulator(processID, request_vector);
         if (bankers_algorithm(processID, request_vector) == 1)
         {
             for (int j = 0; j < numResource; j++)
@@ -173,6 +179,7 @@ void *process_simulator(void *pr_id)
             {
                 aviResource[j] += hold[processID][j];
                 hold[processID][j] = 0;
+                need[processID][j]=0;
             }
         }
         pthread_mutex_unlock(&mutex);
@@ -245,15 +252,20 @@ int main()
         printf("please input the Maximum resource process number %d can claim\n", i);
         for (int j = 0; j < numResource; j++)
         {
-            hold[i][j] = 0;
+            
             scanf("%d", &maxTable[i][j]);
+            if(maxTable[i][j]>aviResource[j]){
+                printf("the required resource is larger than available resources\n");
+                return 0;
+            }
             need[i][j] = maxTable[i][j];
+            hold[i][j] = 0;
         }
     }
     // memcpy(need, maxTable, sizeof(maxTable));
     printf("the number of process: %d\n", numProcess);
     printf("the number of resource: %d\n", numResource);
-    printf("the number of available resource:");
+    printf("the number of available resource:\n");
     printArray(aviResource, numResource);
     printf("Maximum Claim Table:\n");
     for (int i = 0; i < numProcess; i++)
