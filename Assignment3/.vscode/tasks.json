@@ -6,7 +6,7 @@
             "type": "shell",
             "command": "gcc",
             "args": [
-                "-g", "-pthread","resource_request_simulator.c"
+                "-g", "-pthread","faulty_resource_request_simulator.c"
             ],
             "group": {
                 "kind": "build",

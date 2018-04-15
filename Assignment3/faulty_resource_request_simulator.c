@@ -169,7 +169,7 @@ void *process_simulator(void *pr_id)
         request_vector[i] = 0;
     }
     int done = 0;
-    int needSleep =0;
+    int needSleep = 0;
     int processID = *((int *)pr_id);
     printf("process %d running\n", processID);
 
@@ -184,7 +184,7 @@ void *process_simulator(void *pr_id)
             {
                 if (need[processID][j] != 0)
                 {
-                    needSleep =1;
+                    needSleep = 1;
                     break;
                 }
                 else if (j == numResource - 1)
@@ -208,11 +208,64 @@ void *process_simulator(void *pr_id)
         {
             break;
         }
-        else if(needSleep==1){
+        else if (needSleep == 1)
+        {
             sleep(3);
         }
     }
     printf("process %d finished\n", processID);
+}
+/*
+Simulates a fault occuring on the system.
+
+*/
+void *fault_simulator(void *h)
+{
+    while (1)
+    {
+        int fault_res_num = rand() % numResource;
+        int fault_possiblity = rand() % 2;
+        pthread_mutex_lock(&mutex);
+        if (fault_possiblity == 1 && aviResource[fault_res_num] > 0)
+        {
+            aviResource[fault_res_num] -= 1;
+            printf("resource number %d is faulty, the availbility decreased by 1\n", fault_res_num);
+        }
+        pthread_mutex_unlock(&mutex);
+        sleep(10);
+    }
+}
+
+/*
+Checks for deadlock
+*/
+void *deadlock_checker(void *h)
+{
+    while (1)
+    {
+        pthread_mutex_lock(&mutex);
+        int needSum = 0;
+        int maxResource = 0;
+        if (isSafe() == 0)
+        {
+            printf("Deadlock will occur as processes request more resources, exiting...\n");
+            exit(0);
+        }
+        for (int i = 0; i < numProcess; i++)
+        {
+            for (int j = 0; j < numResource; j++)
+            {
+                needSum += need[i][j];
+            }
+        }
+        if (needSum == 0)
+        {
+            printf("All process are finished, exiting...\n");
+            exit(0);
+        }
+        pthread_mutex_unlock(&mutex);
+        sleep(10);
+    }
 }
 
 int main()
@@ -273,6 +326,7 @@ int main()
     {
         printArray(maxTable[i], numResource);
     }
+
     // create threads simulating processes (process_simulator)
     pthread_t processes[numProcess];
     int *process_ids[numProcess];
@@ -285,13 +339,25 @@ int main()
         //create plane threads passing in the plane function and plane id pointer
         if (pthread_create(&processes[i], NULL, process_simulator, process_ids[i]) != 0)
         {
-            printf("Error when creating thread for process thread number : %d\n", i);
+            printf("Error when creating thread for process number : %d\n", i);
         }
     }
-
-    // create a thread that takes away resources from the available pool (fault_simulator)
-
+    int dummy = 1;
     //create a thread to check for deadlock (deadlock_checker)
+    printf("creating fault deadlock checker thread\n");
+    pthread_t deadlock_check;
+    if (pthread_create(&deadlock_check, NULL, deadlock_checker, &dummy) != 0)
+    {
+        printf("Error when creating thread for deadlock checker\n");
+    }
+    // create a thread that takes away resources from the available pool (fault_simulator)
+    pthread_t fault_sim;
+    printf("creating fault simulator thread\n");
+    if (pthread_create(&fault_sim, NULL, fault_simulator, &dummy) != 0)
+    {
+        printf("Error when creating thread for fault simulator\n");
+    }
+
     pthread_exit(NULL);
     return 0;
 }
