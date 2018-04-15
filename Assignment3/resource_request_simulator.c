@@ -32,28 +32,28 @@ int **need;
 int **hold;
 void request_simulator(int pr_id, int *request_vector)
 {
-    printf("simulating request for %d", pr_id);
-    printArray(need[pr_id],numResource);
+    printf("simulating request for %d needing: ", pr_id);
+    printArray(need[pr_id], numResource);
     for (int i = 0; i < numResource; i++)
     {
         if (need[pr_id][i] != 0)
         {
-            
-            request_vector[i] = rand() % (need[pr_id][i]) + 1;
-            
+
+            request_vector[i] = rand() % (need[pr_id][i] + 1);
         }
-        else{
+        else
+        {
             request_vector[i] = 0;
         }
     }
-    printArray(request_vector,numResource);
+    printf("request vector:  ");
+    printArray(request_vector, numResource);
 }
 /*
 Implementation of isSafe() as described in the slides
 */
 int isSafe()
 {
-    printf("checkin safty\n");
     int *work = malloc(sizeof(int) * numResource);
     for (int j = 0; j < numResource; j++)
     {
@@ -85,7 +85,7 @@ int isSafe()
                     }
                     finish[i] = 1;
                     sum += 1;
-                    i = -1;//loop extra
+                    i = -1; //loop extra
                 }
             }
         }
@@ -120,22 +120,29 @@ int bankers_algorithm(int pr_id, int *request_vector)
     }
     for (int j = 0; j < numResource; j++)
     {
+        // pthread_mutex_lock(&mutex);
         aviResource[j] -= request_vector[j];
         hold[pr_id][j] += request_vector[j];
         need[pr_id][j] -= request_vector[j];
+        // pthread_mutex_unlock(&mutex);
     }
     if (isSafe() == 1)
     {
+        printf("process %d is safe, still needing: ", pr_id);
+        printArray(need[pr_id], numResource);
         return 1;
     }
     else
     {
         for (int j = 0; j < numResource; j++)
         {
+            // pthread_mutex_lock(&mutex);
             aviResource[j] += request_vector[j];
             hold[pr_id][j] -= request_vector[j];
             need[pr_id][j] += request_vector[j];
+            // pthread_mutex_unlock(&mutex);
         }
+        printf("Allocation is not safe for process %d\n", pr_id);
     }
     return 0;
 }
@@ -157,8 +164,8 @@ void *process_simulator(void *pr_id)
 
     while (1)
     {
-        pthread_mutex_lock(&mutex);
         request_simulator(processID, request_vector);
+        pthread_mutex_lock(&mutex);
         if (bankers_algorithm(processID, request_vector) == 1)
         {
             for (int j = 0; j < numResource; j++)
@@ -177,9 +184,10 @@ void *process_simulator(void *pr_id)
         {
             for (int j = 0; j < numResource; j++)
             {
+                // pthread_mutex_lock(&mutex);
                 aviResource[j] += hold[processID][j];
                 hold[processID][j] = 0;
-                need[processID][j]=0;
+                // pthread_mutex_unlock(&mutex);
             }
         }
         pthread_mutex_unlock(&mutex);
@@ -252,9 +260,10 @@ int main()
         printf("please input the Maximum resource process number %d can claim\n", i);
         for (int j = 0; j < numResource; j++)
         {
-            
+
             scanf("%d", &maxTable[i][j]);
-            if(maxTable[i][j]>aviResource[j]){
+            if (maxTable[i][j] > aviResource[j])
+            {
                 printf("the required resource is larger than available resources\n");
                 return 0;
             }
