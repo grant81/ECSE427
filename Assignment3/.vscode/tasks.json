@@ -6,7 +6,7 @@
             "type": "shell",
             "command": "gcc",
             "args": [
-                "-g", "-pthread","faulty_resource_request_simulator.c"
+                "-g","part2_skeleton.c"
             ],
             "group": {
                 "kind": "build",
