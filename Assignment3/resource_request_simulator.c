@@ -106,7 +106,7 @@ int isSafe()
                 }
             }
         }
-    
+        
     }
     //if all process is marked finished, the allocation is safe
     if (sum == numProcess)
@@ -138,9 +138,10 @@ int bankers_algorithm(int pr_id, int *request_vector)
         }
     }
     //allocate the resource to that process according to request to do isSafe check
-    for (int j = 0; j < numResource; j++)
+    for (int j = 0; //most of the logic is the same as the accessSCAN, the place that is different
+    //the only difference is that it will not hit either of the boundariesj < numResource; j++)
     {
-        
+
         aviResource[j] -= request_vector[j];
         hold[pr_id][j] += request_vector[j];
         need[pr_id][j] -= request_vector[j];
@@ -160,7 +161,6 @@ int bankers_algorithm(int pr_id, int *request_vector)
             aviResource[j] += request_vector[j];
             hold[pr_id][j] -= request_vector[j];
             need[pr_id][j] += request_vector[j];
-
         }
         printf("Allocation is not safe for process %d\n", pr_id);
     }
@@ -180,7 +180,7 @@ void *process_simulator(void *pr_id)
         request_vector[i] = 0;
     }
     int done = 0;
-    int needSleep =0;
+    int needSleep = 0;
     int processID = *((int *)pr_id);
     printf("process %d running\n", processID);
     //the while loop will keep generating different request and keep checking
@@ -202,7 +202,7 @@ void *process_simulator(void *pr_id)
             {
                 if (need[processID][j] != 0)
                 {
-                    needSleep =1;
+                    needSleep = 1;
                     break;
                 }
                 else if (j == numResource - 1)
@@ -212,7 +212,7 @@ void *process_simulator(void *pr_id)
             }
         }
         if (done == 1)
-        {   
+        {
             //if needs are satisified release hold resources
             for (int j = 0; j < numResource; j++)
             {
@@ -221,11 +221,14 @@ void *process_simulator(void *pr_id)
             }
         }
         pthread_mutex_unlock(&mutex);
+        //if the process gets all resources it terminates by exiting the while loop
         if (done == 1)
         {
             break;
         }
-        else if(needSleep==1){
+         //sleep when resources acquired and still needs more resources
+        else if (needSleep == 1)
+        {
             sleep(3);
         }
     }
@@ -247,7 +250,7 @@ int main()
         scanf("%d", &numResource);
     }
     aviResource = malloc(sizeof(int) * numResource);
-
+    //take in the number of each available resources
     for (int i = 0; i < numResource; i++)
     {
         int temp = 0;
@@ -255,16 +258,19 @@ int main()
         scanf("%d", &temp);
         aviResource[i] = temp;
     }
+    //give memory to three double arrays
     maxTable = malloc(numProcess * sizeof(int *));
     need = malloc(numProcess * sizeof(int *));
     hold = malloc(numProcess * sizeof(int *));
+
     for (int i = 0; i < numResource; i++)
     {
-        maxTable[i] = malloc(numResource * sizeof(int));
+        maxTable[i] = malloc(numResource * sizeof(int));    
         need[i] = malloc(numResource * sizeof(int));
         hold[i] = malloc(numResource * sizeof(int));
     }
-
+    //takes in the number of resource available for each process each resources
+    //and assign those values to the max table, need table.
     for (int i = 0; i < numProcess; i++)
     {
         printf("please input the Maximum resource process number %d can claim\n", i);
@@ -298,9 +304,9 @@ int main()
     {
         printf("Creating process %d\n", i);
         process_ids[i] = malloc(sizeof(int));
-        //assign the value of the plane id to that pointer
+        //assign the value of the process id to that pointer
         *process_ids[i] = i;
-        //create plane threads passing in the plane function and plane id pointer
+        //create process threads passing in the process simulate function and process id pointer
         if (pthread_create(&processes[i], NULL, process_simulator, process_ids[i]) != 0)
         {
             printf("Error when creating thread for process thread number : %d\n", i);

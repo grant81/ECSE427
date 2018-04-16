@@ -31,6 +31,7 @@ int **maxTable;
 int **need;
 int **hold;
 
+//this function prints a one dimension int array
 void printArray(int param[], int length)
 {
     for (int i = 0; i < length; i++)
@@ -39,7 +40,7 @@ void printArray(int param[], int length)
     }
     printf("\n");
 }
-
+//simulate request
 void request_simulator(int pr_id, int *request_vector)
 {
     printf("simulating request for %d needing: ", pr_id);
@@ -48,11 +49,13 @@ void request_simulator(int pr_id, int *request_vector)
     {
         if (need[pr_id][i] != 0)
         {
-
+            //for each resource, request 0 - needed amount of that resource
+            //and store in the request vector
             request_vector[i] = rand() % (need[pr_id][i] + 1);
         }
         else
         {
+            //if the need for that resource is 0, request 0
             request_vector[i] = 0;
         }
     }
@@ -64,19 +67,24 @@ Implementation of isSafe() as described in the slides
 */
 int isSafe()
 {
+    //copy everything in the available resource array into work array
     int *work = malloc(sizeof(int) * numResource);
     for (int j = 0; j < numResource; j++)
     {
         work[j] = aviResource[j];
     }
     int isSafe = 0;
+    //an array to store the status of each proces
     int finish[numProcess];
     for (int i = 0; i < numProcess; i++)
     {
         finish[i] = 0;
     }
     int sum = 0;
-
+    //for each unfinished process the loops below try to find a process
+    //that needs for every resource is smaller than available resource
+    //if it is found, marke it as finished, add all its holds into works, and restart the first
+    //loop and try to found another one
     for (int i = 0; i < numProcess; i++)
     {
         if (finish[i] == 0)
@@ -99,15 +107,14 @@ int isSafe()
                 }
             }
         }
-        if (i == numProcess - 1 && sum == 0)
-        {
-            return isSafe;
-        }
+        
     }
+    //if all process is marked finished, the allocation is safe
     if (sum == numProcess)
     {
         isSafe = 1;
     }
+    //else return unsafe
     return isSafe;
 }
 /*
@@ -117,6 +124,7 @@ returns 1 if safe allocation 0 if not safe
 int bankers_algorithm(int pr_id, int *request_vector)
 {
     printf("bankers for %d\n", pr_id);
+    //check if request> need or request is larger than available for all resources
     for (int j = 0; j < numResource; j++)
     {
         if (request_vector[j] > need[pr_id][j])
@@ -130,29 +138,29 @@ int bankers_algorithm(int pr_id, int *request_vector)
             return 0;
         }
     }
+    //allocate the resource to that process according to request to do isSafe check
     for (int j = 0; j < numResource; j++)
     {
-        // pthread_mutex_lock(&mutex);
+
         aviResource[j] -= request_vector[j];
         hold[pr_id][j] += request_vector[j];
         need[pr_id][j] -= request_vector[j];
-        // pthread_mutex_unlock(&mutex);
     }
+    //if isSafe check passes, the allocation remains, bankers return 1
     if (isSafe() == 1)
     {
         printf("process %d is safe, still needing: ", pr_id);
         printArray(need[pr_id], numResource);
         return 1;
     }
+    //if isSafe check fails, the allocation revert back, bankers return 0
     else
     {
         for (int j = 0; j < numResource; j++)
         {
-            // pthread_mutex_lock(&mutex);
             aviResource[j] += request_vector[j];
             hold[pr_id][j] -= request_vector[j];
             need[pr_id][j] += request_vector[j];
-            // pthread_mutex_unlock(&mutex);
         }
         printf("Allocation is not safe for process %d\n", pr_id);
     }
@@ -165,6 +173,7 @@ Simulates processes running on the system.
 */
 void *process_simulator(void *pr_id)
 {
+    //create a request vector and initialize all entries as 0
     int request_vector[numResource];
     for (int i = 0; i < numResource; i++)
     {
@@ -174,14 +183,21 @@ void *process_simulator(void *pr_id)
     int needSleep = 0;
     int processID = *((int *)pr_id);
     printf("process %d running\n", processID);
-
+    //the while loop will keep generating different request and keep checking
+    //with banker algorithm, until it gets all needed resources and finish
     while (1)
     {
+        //generating requests
         request_simulator(processID, request_vector);
+        //critical section
         pthread_mutex_lock(&mutex);
         needSleep = 0;
+        //if the allocation with the request vector is safe
         if (bankers_algorithm(processID, request_vector) == 1)
         {
+            //the for loop below check if the process gets all its needs
+            //if its need vector is all 0, it can terminate and release all
+            //holding resources, or sleep for 3 seconds
             for (int j = 0; j < numResource; j++)
             {
                 if (need[processID][j] != 0)
@@ -197,19 +213,20 @@ void *process_simulator(void *pr_id)
         }
         if (done == 1)
         {
+            //if needs are satisified release hold resources
             for (int j = 0; j < numResource; j++)
             {
-                // pthread_mutex_lock(&mutex);
                 aviResource[j] += hold[processID][j];
                 hold[processID][j] = 0;
-                // pthread_mutex_unlock(&mutex);
             }
         }
         pthread_mutex_unlock(&mutex);
+        //if the process gets all resources it terminates by exiting the while loop
         if (done == 1)
         {
             break;
         }
+        //sleep when resources acquired and still needs more resources
         else if (needSleep == 1)
         {
             sleep(3);
@@ -225,11 +242,16 @@ void *fault_simulator(void *h)
 {
     while (1)
     {
+        //randomly pick a resource number that is faulty
         int fault_res_num = rand() % numResource;
+        //give it 50% chance to be really faulty
         int fault_possiblity = rand() % 2;
+        //critial section
         pthread_mutex_lock(&mutex);
+        //check if the the availability of resource that is faulty is greater than 0 
         if (fault_possiblity == 1 && aviResource[fault_res_num] > 0)
         {
+            //reduce availability by 1
             aviResource[fault_res_num] -= 1;
             printf("resource number %d is faulty, the availbility decreased by 1\n", fault_res_num);
         }
@@ -245,14 +267,19 @@ void *deadlock_checker(void *h)
 {
     while (1)
     {
-        pthread_mutex_lock(&mutex);
         int needSum = 0;
         int maxResource = 0;
+        //critical section
+        pthread_mutex_lock(&mutex);
+        //check if all process can finish using isSafe()
         if (isSafe() == 0)
         {
+            //if not safe, exit
             printf("Deadlock will occur as processes request more resources, exiting...\n");
             exit(0);
         }
+        //the for loop below checks if all process has finished
+        //by adding the whole need array together
         for (int i = 0; i < numProcess; i++)
         {
             for (int j = 0; j < numResource; j++)
@@ -260,6 +287,7 @@ void *deadlock_checker(void *h)
                 needSum += need[i][j];
             }
         }
+        //if the total need is 0, means all process has finished, exit
         if (needSum == 0)
         {
             printf("All process are finished, exiting...\n");
@@ -276,6 +304,7 @@ int main()
     //Initialize all inputs to banker's algorithm
     char inputBuffer[20];
     pthread_mutex_init(&mutex, NULL);
+    //take in number of resources and processes
     while (numProcess == 0 || numResource == 0)
     {
         printf("Please input the number of processes\n");
@@ -284,7 +313,7 @@ int main()
         scanf("%d", &numResource);
     }
     aviResource = malloc(sizeof(int) * numResource);
-
+    //take in the number of each available resources
     for (int i = 0; i < numResource; i++)
     {
         int temp = 0;
@@ -292,16 +321,19 @@ int main()
         scanf("%d", &temp);
         aviResource[i] = temp;
     }
+    //give memory to three double arrays
     maxTable = malloc(numProcess * sizeof(int *));
     need = malloc(numProcess * sizeof(int *));
     hold = malloc(numProcess * sizeof(int *));
+
     for (int i = 0; i < numResource; i++)
     {
         maxTable[i] = malloc(numResource * sizeof(int));
         need[i] = malloc(numResource * sizeof(int));
         hold[i] = malloc(numResource * sizeof(int));
     }
-
+    //takes in the number of resource available for each process each resources
+    //and assign those values to the max table, need table.
     for (int i = 0; i < numProcess; i++)
     {
         printf("please input the Maximum resource process number %d can claim\n", i);
@@ -328,7 +360,6 @@ int main()
     {
         printArray(maxTable[i], numResource);
     }
-
     // create threads simulating processes (process_simulator)
     pthread_t processes[numProcess];
     int *process_ids[numProcess];
@@ -336,14 +367,15 @@ int main()
     {
         printf("Creating process %d\n", i);
         process_ids[i] = malloc(sizeof(int));
-        //assign the value of the plane id to that pointer
+        //assign the value of the process id to that pointer
         *process_ids[i] = i;
-        //create plane threads passing in the plane function and plane id pointer
+        //create process threads passing in the process simulate function and process id pointer
         if (pthread_create(&processes[i], NULL, process_simulator, process_ids[i]) != 0)
         {
-            printf("Error when creating thread for process number : %d\n", i);
+            printf("Error when creating thread for process thread number : %d\n", i);
         }
     }
+
     int dummy = 1;
     //create a thread to check for deadlock (deadlock_checker)
     printf("creating fault deadlock checker thread\n");

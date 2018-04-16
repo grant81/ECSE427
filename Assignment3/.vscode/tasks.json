@@ -6,7 +6,7 @@
             "type": "shell",
             "command": "gcc",
             "args": [
-                "-g","part2_skeleton.c"
+                "-g","part2_skeleton.c","-o","part2_skeleton.out"
             ],
             "group": {
                 "kind": "build",
