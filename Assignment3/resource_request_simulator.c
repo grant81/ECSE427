@@ -138,8 +138,7 @@ int bankers_algorithm(int pr_id, int *request_vector)
         }
     }
     //allocate the resource to that process according to request to do isSafe check
-    for (int j = 0; //most of the logic is the same as the accessSCAN, the place that is different
-    //the only difference is that it will not hit either of the boundariesj < numResource; j++)
+    for (int j = 0;  < numResource; j++)
     {
 
         aviResource[j] -= request_vector[j];
