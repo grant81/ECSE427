@@ -3,7 +3,7 @@
 
 #define LOW 0
 #define HIGH 199
-#define START 120
+#define START 101
 
 //compare function for qsort
 //you might have to sort the request array
@@ -103,7 +103,7 @@ void accessSCAN(int *request, int numRequest)
 
         for (int i = 0; i < numRequest; i++)
         {
-            if (request[i] > curr)
+            if (request[i] >= curr)
             {
                 firstLocation = i;
                 break;
@@ -159,6 +159,11 @@ void accessSCAN(int *request, int numRequest)
             if (request[i] > curr)
             {
                 firstLocation = i - 1;
+                break;
+            }
+            else if (request[i] == curr)
+            {
+                firstLocation = i;
                 break;
             }
             if (i == numRequest - 1)
@@ -218,18 +223,23 @@ void accessCSCAN(int *request, int numRequest)
     int firstLocation = -1;
     int newCnt = numRequest + 2;
     int *newRequest = malloc(newCnt * sizeof(int));
+    int specialCase = 0;
     if (abs(curr - LOW) > abs(curr - HIGH))
     {
 
-        for (int i = numRequest - 1; i >= 0; i--)
+        for (int i = 0; i < numRequest; i++)
         {
-            if (request[i] < curr)
+            if (request[i] >= curr)
             {
-                firstLocation = i + 1;
+                firstLocation = i;
                 break;
             }
+            if (i == numRequest - 1)
+            {
+                specialCase = 1;
+            }
         }
-        if (firstLocation >= 0)
+        if (firstLocation > 0)
         {
             int nextLoc = 0;
             for (int i = firstLocation; i < numRequest; i++)
@@ -245,6 +255,19 @@ void accessCSCAN(int *request, int numRequest)
             {
                 newRequest[nextLoc] = request[i];
                 nextLoc++;
+            }
+        }
+        //everything is larger than currerent location
+        else if (specialCase == 1)
+        {
+
+            newCnt = numRequest;
+            newRequest = realloc(newRequest, numRequest);
+            int counter = numRequest;
+            for (int i = 0; i < numRequest; i++)
+            {
+                counter--;
+                newRequest[counter] = request[i];
             }
         }
         //everything is larger than currerent location
@@ -267,6 +290,15 @@ void accessCSCAN(int *request, int numRequest)
                 firstLocation = i - 1;
                 break;
             }
+            else if (request[i] == curr)
+            {
+                firstLocation = i;
+                break;
+            }
+            if (i == numRequest - 1)
+            {
+                specialCase = 1;
+            }
         }
         if (firstLocation >= 0)
         {
@@ -286,7 +318,7 @@ void accessCSCAN(int *request, int numRequest)
                 nextLoc++;
             }
         }
-        else
+        else if (specialCase == 1)
         {
             newCnt = numRequest;
             newRequest = realloc(newRequest, numRequest);
@@ -295,6 +327,15 @@ void accessCSCAN(int *request, int numRequest)
             {
                 counter--;
                 newRequest[counter] = request[i];
+            }
+        }
+        else
+        {
+            newCnt = numRequest;
+            newRequest = realloc(newRequest, numRequest);
+            for (int i = 0; i < numRequest; i++)
+            {
+                newRequest[i] = request[i];
             }
         }
     }
@@ -317,18 +358,23 @@ void accessLOOK(int *request, int numRequest)
     int firstLocation = -1;
     int newCnt = numRequest;
     int *newRequest = malloc(newCnt * sizeof(int));
+    int specialCase = 0;
     if (abs(curr - LOW) > abs(curr - HIGH))
     {
 
-        for (int i = numRequest - 1; i >= 0; i--)
+        for (int i = 0; i < numRequest; i++)
         {
-            if (request[i] < curr)
+            if (request[i] >= curr)
             {
-                firstLocation = i + 1;
+                firstLocation = i;
                 break;
             }
+            if (i == numRequest - 1)
+            {
+                specialCase = 1;
+            }
         }
-        if (firstLocation >= 0)
+        if (firstLocation > 0)
         {
             int nextLoc = 0;
             for (int i = firstLocation; i < numRequest; i++)
@@ -342,10 +388,23 @@ void accessLOOK(int *request, int numRequest)
                 nextLoc++;
             }
         }
+        else if (specialCase == 1)
+        {
+
+            newCnt = numRequest;
+            newRequest = realloc(newRequest, numRequest);
+            int counter = numRequest;
+            for (int i = 0; i < numRequest; i++)
+            {
+                counter--;
+                newRequest[counter] = request[i];
+            }
+        }
         //everything is larger than currerent location
         else
         {
-
+            newCnt = numRequest;
+            newRequest = realloc(newRequest, numRequest);
             for (int i = 0; i < numRequest; i++)
             {
                 newRequest[i] = request[i];
@@ -360,6 +419,15 @@ void accessLOOK(int *request, int numRequest)
             {
                 firstLocation = i - 1;
                 break;
+            }
+            else if (request[i] == curr)
+            {
+                firstLocation = i;
+                break;
+            }
+            if (i == numRequest - 1)
+            {
+                specialCase = 1;
             }
         }
         if (firstLocation >= 0)
@@ -376,13 +444,24 @@ void accessLOOK(int *request, int numRequest)
                 nextLoc++;
             }
         }
-        else
+        else if (specialCase == 1)
         {
+            newCnt = numRequest;
+            newRequest = realloc(newRequest, numRequest);
             int counter = numRequest;
             for (int i = 0; i < numRequest; i++)
             {
                 counter--;
                 newRequest[counter] = request[i];
+            }
+        }
+        else
+        {
+            newCnt = numRequest;
+            newRequest = realloc(newRequest, numRequest);
+            for (int i = 0; i < numRequest; i++)
+            {
+                newRequest[i] = request[i];
             }
         }
     }
@@ -401,19 +480,24 @@ void accessCLOOK(int *request, int numRequest)
     int curr = START;
     int firstLocation = -1;
     int newCnt = numRequest + 1;
+    int specialCase = 0;
     int *newRequest = malloc(newCnt * sizeof(int));
     if (abs(curr - LOW) > abs(curr - HIGH))
     {
 
-        for (int i = numRequest - 1; i >= 0; i--)
+        for (int i = 0; i < numRequest; i++)
         {
-            if (request[i] < curr)
+            if (request[i] >= curr)
             {
-                firstLocation = i + 1;
+                firstLocation = i;
                 break;
             }
+            if (i == numRequest - 1)
+            {
+                specialCase = 1;
+            }
         }
-        if (firstLocation >= 0)
+        if (firstLocation > 0)
         {
             int nextLoc = 0;
             for (int i = firstLocation; i < numRequest; i++)
@@ -427,6 +511,19 @@ void accessCLOOK(int *request, int numRequest)
             {
                 newRequest[nextLoc] = request[i];
                 nextLoc++;
+            }
+        }
+        //everything is larger than currerent location
+        else if (specialCase == 1)
+        {
+
+            newCnt = numRequest;
+            newRequest = realloc(newRequest, numRequest);
+            int counter = numRequest;
+            for (int i = 0; i < numRequest; i++)
+            {
+                counter--;
+                newRequest[counter] = request[i];
             }
         }
         //everything is larger than currerent location
@@ -449,6 +546,15 @@ void accessCLOOK(int *request, int numRequest)
                 firstLocation = i - 1;
                 break;
             }
+            else if (request[i] == curr)
+            {
+                firstLocation = i;
+                break;
+            }
+            if (i == numRequest - 1)
+            {
+                specialCase = 1;
+            }
         }
         if (firstLocation >= 0)
         {
@@ -466,7 +572,7 @@ void accessCLOOK(int *request, int numRequest)
                 nextLoc++;
             }
         }
-        else
+        else if (specialCase == 1)
         {
             newCnt = numRequest;
             newRequest = realloc(newRequest, numRequest);
@@ -475,6 +581,15 @@ void accessCLOOK(int *request, int numRequest)
             {
                 counter--;
                 newRequest[counter] = request[i];
+            }
+        }
+        else
+        {
+            newCnt = numRequest;
+            newRequest = realloc(newRequest, numRequest);
+            for (int i = 0; i < numRequest; i++)
+            {
+                newRequest[i] = request[i];
             }
         }
     }

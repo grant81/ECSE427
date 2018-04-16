@@ -121,10 +121,12 @@ int bankers_algorithm(int pr_id, int *request_vector)
     {
         if (request_vector[j] > need[pr_id][j])
         {
+            printf("Allocation is not safe for process %d\n", pr_id);
             return 0;
         }
         else if (request_vector[j] > aviResource[j])
         {
+            printf("Allocation is not safe for process %d\n", pr_id);
             return 0;
         }
     }
